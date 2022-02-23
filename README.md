@@ -41,3 +41,12 @@ func Sum(ctx context.Context, req *sumRequest) (*sumResponse, error) {
 	return &sumResponse{Sum: sum}, nil
 }
 ```
+
+## Contributions
+
+Contributions are welcome and encouraged. Please feel free to submit PRs!
+
+Some features that would be useful but don't yet exist:
+
+- Middleware
+- Optional support for non-JSON encodings (XML, YAML, etc.)
