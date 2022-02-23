@@ -50,3 +50,4 @@ Some features that would be useful but don't yet exist:
 
 - Middleware
 - Optional support for non-JSON encodings (XML, YAML, etc.)
+- Storing more metadata in `context` value
