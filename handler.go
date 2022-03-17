@@ -1,9 +1,11 @@
 package ezrpc
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -39,6 +41,9 @@ func Handle[T, K any](handler Handler[T, K]) http.Handler {
 
 // decodeRequestBody decodes the incoming request body into the appropriate type for an RPC handler.
 func decodeRequestBody[T any](r *http.Request) (*T, error) {
+	if r.Body == nil {
+		r.Body = io.NopCloser(bytes.NewBufferString(""))
+	}
 	// TODO: allow other types of decoders than just JSON
 	dec := json.NewDecoder(r.Body)
 	defer r.Body.Close()
