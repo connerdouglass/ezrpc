@@ -8,20 +8,26 @@ import (
 	"github.com/connerdouglass/ezrpc"
 )
 
+func CheckAuth(ctx context.Context, _ *http.Request) (context.Context, error) {
+	log.Println("Checking authentication...")
+	return ctx, nil
+}
+
 func main() {
 
 	// Create a pipeline of middleware
 	rpc := ezrpc.
 		New().
 		Then(
-			ezrpc.Middleware(func(ctx context.Context, _ *http.Request) (context.Context, error) {
+			CheckAuth,
+			func(ctx context.Context, _ *http.Request) (context.Context, error) {
 				log.Println("First middleware")
 				return ctx, nil
-			}),
-			ezrpc.Middleware(func(ctx context.Context, _ *http.Request) (context.Context, error) {
+			},
+			func(ctx context.Context, _ *http.Request) (context.Context, error) {
 				log.Println("Second middleware")
 				return ctx, nil
-			}),
+			},
 		)
 
 	// Create an HTTP mux and register the RPC hooks

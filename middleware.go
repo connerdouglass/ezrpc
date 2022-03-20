@@ -28,11 +28,19 @@ func thenOne(f Middleware, next Middleware) Middleware {
 
 // Then appends another middleware to the pipeline and returns a new pipeline tail
 func (f Middleware) Then(next ...Middleware) Middleware {
-	m := Middleware(f)
-	for _, n := range next {
-		m = thenOne(m, n)
-	}
-	return m
+	return Middleware(func(ctx context.Context, r *http.Request) (context.Context, error) {
+		ctx, err := f(ctx, r)
+		if err != nil {
+			return ctx, err
+		}
+		for _, nextOne := range next {
+			ctx, err = nextOne(ctx, r)
+			if err != nil {
+				return ctx, err
+			}
+		}
+		return ctx, nil
+	})
 }
 
 // Handle adds a HTTP handler as a sink to the middleware pipeline
