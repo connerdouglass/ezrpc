@@ -28,5 +28,5 @@ func (err *_implErrorWithCode) Code() int {
 }
 
 func (err *_implErrorWithCode) Error() string {
-	return err.Error()
+	return err.err.Error()
 }

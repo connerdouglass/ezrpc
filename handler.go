@@ -1,11 +1,9 @@
 package ezrpc
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -15,6 +13,12 @@ type Handler[T, K any] func(context.Context, *T) (*K, error)
 // Handle wraps an RPC handler in HTTP logic so that it can be connected to an HTTP server
 func Handle[T, K any](handler Handler[T, K]) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+
+		// Require the request to be made with a POST method
+		if r.Method != "POST" {
+			writeError(rw, ErrorWithCode(fmt.Errorf("unsupported HTTP method: %s", r.Method), http.StatusBadRequest))
+			return
+		}
 
 		// Decode the request from JSON
 		req, err := decodeRequestBody[T](r)
@@ -41,9 +45,6 @@ func Handle[T, K any](handler Handler[T, K]) http.Handler {
 
 // decodeRequestBody decodes the incoming request body into the appropriate type for an RPC handler.
 func decodeRequestBody[T any](r *http.Request) (*T, error) {
-	if r.Body == nil {
-		r.Body = io.NopCloser(bytes.NewBufferString(""))
-	}
 	// TODO: allow other types of decoders than just JSON
 	dec := json.NewDecoder(r.Body)
 	defer r.Body.Close()
