@@ -1,5 +1,7 @@
 package ezrpc
 
+import "fmt"
+
 // errorWithCode defines the internal interface of an error that also contains an error code.
 // It is useful to wrap errors in this interface within your RPC hooks to specify the type of
 // error that occurred, so the appropriate HTTP status code can be returned.
@@ -9,7 +11,11 @@ type errorWithCode interface {
 }
 
 // ErrorWithCode wraps an error with an HTTP status code, so that it will be used as the RPC response.
-func ErrorWithCode(err error, code int) error {
+func ErrorWithCode(err error, code int, msgAndArgs ...any) error {
+	if len(msgAndArgs) > 0 {
+		msg := fmt.Sprint(msgAndArgs...)
+		err = fmt.Errorf("%s: %s", msg, err)
+	}
 	return &_implErrorWithCode{
 		err,
 		code,
